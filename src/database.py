@@ -40,7 +40,6 @@ class ClaseDB:
                 FOREIGN KEY (id_estado_laboral) REFERENCES estado_laboral (id_estado_laboral)
             )
         """)
-
     def print_tabla(self,tabla):  ### abandonado #### NO USAR
         self.cursor.execute(f"SELECT * FROM {tabla}")
         print(self.cursor.fetchall())
