@@ -62,39 +62,28 @@ class Star():
         self.tree.grid(row=0,column=0)
         self.refrescar_tree()
 
-    def ventana_movimientos(self):
+    def mostrar_ventana(self):
         self.ventana_mostrar = tk.Toplevel(self.root)
         self.ventana_mostrar.title("Nueva ventana")
         self.ventana_mostrar.geometry("800x500")
         self.ventana_mostrar.grab_set()
 
-        self.movimientos_widgets()
+        self.mostrar_ventana_widgets()
 
-    def movimientos_widgets(self):
-        self.movimientos_datos()
-        self.movimientos_labels()
-
-    def movimientos_datos(self):
+    def mostrar_ventana_widgets(self):
         registro = db.consultar("SELECT * FROM personal WHERE cedula=(?)",(self.textbox_buscar.get(),))
-        print(registro)
-        self.mostrar_cedula = tk.Label(self.ventana_mostrar,text=registro[0][1]).grid(row=0,column=1)  # Cedula
-        self.mostrar_nombres = tk.Label(self.ventana_mostrar,text=registro[0][2]).grid(row=1,column=1) # Nombres
-        self.mostrar_apellidos = tk.Label(self.ventana_mostrar,text=registro[0][3]).grid(row=2,column=1)
-        self.mostrar_direccion = tk.Label(self.ventana_mostrar,text=registro[0][4]).grid(row=3,column=1)
-        self.mostrar_correo = tk.Label(self.ventana_mostrar,text=registro[0][5]).grid(row=4,column=1)
-        self.mostrar_telefono = tk.Label(self.ventana_mostrar,text=registro[0][6]).grid(row=5,column=1)
-        self.mostrar_carnet = tk.Label(self.ventana_mostrar,text=registro[0][7]).grid(row=6,column=1)
-        self.mostrar_comuna = tk.Label(self.ventana_mostrar,text=registro[0][8]).grid(row=7,column=1)
+        if not registro:
+            messagebox.showwarning("Error", "No se encontró el registro")
+            return
+        datos = registro[0]
+        for i, campo in enumerate(self.tree_columnas):
+            label = tk.Label(self.ventana_mostrar, text=campo)
+            label.grid(row=i, column=0, pady=5, padx=5)
 
-    def movimientos_labels(self):
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="Cedula: ").grid(row=0,column=0)
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="Nombre: ").grid(row=1,column=0)
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="Apellidos: ").grid(row=2,column=0)
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="Direccion: ").grid(row=3,column=0)
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="Correo: ").grid(row=4,column=0)
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="N. Telf: ").grid(row=5,column=0)
-        self.nombres_label = tk.Label(self.ventana_mostrar,text="Carnet P.: ").grid(row=6,column=0)
-
+            entry = tk.Entry(self.ventana_mostrar)
+            entry.grid(row=i, column=1, pady=5, padx=5)
+            entry.insert(0,datos[i])
+            entry.config(state="readonly")
 
 
 
@@ -116,7 +105,7 @@ class Star():
             # print(cedulas_db)
         if self.cedula_buscar in cedulas_db:
             messagebox.showinfo("Yay","EXISTE!!!11!!")
-            self.ventana_movimientos()
+            self.mostrar_ventana()
 
         else:
             messagebox.showinfo("No encontrado","No se encontro en la base de datos.")
