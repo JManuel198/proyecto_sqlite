@@ -81,9 +81,12 @@ class ClaseDB:
         print(self.cursor.fetchall())
         return self.cursor.fetchall()
 
-    def consultar(self,sql):
-        self.cursor.execute(sql)
-        self.conexion.commit()
+    def consultar(self,sql, parametros=None):
+        if parametros:
+            self.cursor.execute(sql,parametros)
+        else:
+            self.cursor.execute(sql)
+
         return self.cursor.fetchall()
 
     def cerrar(self):

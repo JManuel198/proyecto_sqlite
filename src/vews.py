@@ -22,7 +22,7 @@ class Star():
         self.boton_refrescar = tk.Button(self.header_frame,text="refrescar",command=self.refrescar_tree)
         self.boton_refrescar.grid(row=0,column=0)
 
-        self.boton_mostrar = tk.Button(self.header_frame,text="Mostrar",command=self.ventana_mostrar)
+        self.boton_mostrar = tk.Button(self.header_frame,text="Mostrar",command=self.ventana_mostrar) # kasjdaskjdhsakjdhsakdsadasd
         self.boton_mostrar.grid(row=0,column=1)
         self.boton_nuevo = tk.Button(self.header_frame,text="Nuevo",command=lambda:messagebox.showinfo("Work in Progress","Aqui se mostrara la ventana"))
         self.boton_nuevo.grid(row=0,column=2)
@@ -57,13 +57,62 @@ class Star():
         self.refrescar_tree()
 
     def ventana_mostrar(self):
-        self.ventana_mostrar = tk.Toplevel(self.root)
-        self.ventana_mostrar.title("Nueva ventana")
-        self.ventana_mostrar.geometry("200x200")
 
-        self.ventana_mostrar.grab_set()
-        self.ventana_label = tk.Label(self.ventana_mostrar,text="Esta es la ventana que muestra la informacion en solo lectura")
-        self.ventana.grid(row=0,column=0)
+        #nuevo: obtener la fila seleccionada
+        seleccion = self.tree.selection()
+
+         #nuevo: validar si el usuario selecciono algo
+        if not seleccion:
+            messagebox.showwarning('Aviso', 'Seleccione un registro')
+            return
+        
+        #nuevo: obtener los valores de la fila seleccionada
+        valores = self.tree.item(seleccion[0])['values']
+
+        #nuevo: extraer la cedula (segunda columna)
+        cedula = valores[1]
+
+        #nuevo: consultar en la base de datos usando la cedula 
+        registro = list(db.consultar('SELECT * FROM personal WHERE cedula=?', (cedula,)))
+
+        #nuevo: verificar si el registro existe
+        if not registro:
+            messagebox.showerror('Error', 'Registro no encontrado')
+            return
+        
+
+        #cambio: crear la ventana solo si el registro existe
+        self.ventana_detalle = tk.Toplevel(self.root)
+        self.ventana_detalle.title("Mostrar registro")
+        self.ventana_detalle.geometry("500x600")
+        self.ventana_detalle.grab_set()
+
+        #nuevo: llamar la función que crea los widgets automáticamente
+        self.crear_widgets_registro(registro[0])
+
+        #NUEVA FUNCION: crea automaticamente labels y textbox usando los datos encontrados en la base de datos
+    def crear_widgets_registro(self, datos):
+        etiquetas = (
+        'Código','Cédula','Nombres','Apellidos','Dirección','Correo','Teléfono',
+        'Carnet Patria','Comuna','Título','Grado','Cargo',
+        'Tipo Personal','Estado Laboral'
+        )
+    
+        for i, campo in enumerate(etiquetas):
+            #crear label con el nombre del campo 
+            label = tk.Label(self.ventana_detalle, text=campo)
+            label.grid(row=i, column=0, padx=5, pady=5, sticky='w')
+
+            #crear textbox
+            entry = tk.Entry(self.ventana_detalle)
+
+            entry.grid(row=i, column=1, padx=10, pady=5)
+
+            #insertar el valor correspondiente
+            entry.insert(0, datos[i])
+
+            #poner el textbox en modo solo lectura
+            entry.config(state='readonly')
 
     def refrescar_tree(self):
         for registro in self.tree.get_children():
