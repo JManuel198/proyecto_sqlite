@@ -67,7 +67,7 @@ class Star():
     def mostrar_ventana(self):
         self.ventana_mostrar = tk.Toplevel(self.root)
         self.ventana_mostrar.title("Visualizar registro")
-        self.ventana_mostrar.geometry("800x500")
+        self.ventana_mostrar.geometry("300x700")
         self.ventana_mostrar.grab_set()
 
         self.mostrar_ventana_widgets()
@@ -129,6 +129,7 @@ if __name__ == "__main__":
     db = ClaseDB(":memory:")
     db.crear_modelo_base()
     db.datos_prueba()
+
 
     aplicacion = Star()
     aplicacion.root.mainloop()

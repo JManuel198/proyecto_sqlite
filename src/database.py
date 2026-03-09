@@ -6,7 +6,6 @@ datos_personal = [
     (25987654, "Beximar", "Rodriguez", "Av. Principal 12", "bexi@mail.com", "0414-9998877", "0054321", "Comuna B", "Lic. Administracion", 3, 1, 2, 1),
     (18456123, "Carlos", "Perez", "Barrio El Centro", "carlos@mail.com", "0416-5554433", "0099887", "Comuna C", "Bachiller", 1, 5, 1, 2)
 ]
-
 query_insert = """
     INSERT INTO personal (
         cedula, nombres, apellidos, direccion, correo, telefono,
@@ -14,6 +13,7 @@ query_insert = """
         id_grado, id_cargo, id_tipo_personal, id_estado_laboral
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
+
 
 
 # SIEMPRE se debe trabjar usando los metodos de esta clase, se debe evitar a toda cosa usar funciones sqlite directas
@@ -37,13 +37,13 @@ class ClaseDB:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS personal (
                 codigo INTEGER PRIMARY KEY AUTOINCREMENT,
-                cedula INTEGER,
+                cedula INTEGER UNIQUE,
                 nombres TEXT,
                 apellidos TEXT,
                 direccion TEXT,
                 correo TEXT,
                 telefono TEXT,
-                carnet_patria TEXT,
+                carnet_patria TEXT UNIQUE,
                 comuna TEXT,
                 titulo_obtenido TEXT,
                 id_grado INTEGER,
