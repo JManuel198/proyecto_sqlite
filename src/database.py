@@ -2,16 +2,16 @@ import sqlite3
 # Datos dummy para la tabla principal
 # Nota: id_grado, id_cargo, id_tipo, id_estado son los números que insertamos arriba
 datos_personal = [
-    (32160371, "Yusepe", "Moroso Rossi", "Calle 10, Casa 5", "yusepe@mail.com", "0412-1112233", "0012345", "Comuna A", "Ing. Sistemas", 4, 3, 1, 1),
-    (25987654, "Beximar", "Rodriguez", "Av. Principal 12", "bexi@mail.com", "0414-9998877", "0054321", "Comuna B", "Lic. Administracion", 3, 1, 2, 1),
-    (18456123, "Carlos", "Perez", "Barrio El Centro", "carlos@mail.com", "0416-5554433", "0099887", "Comuna C", "Bachiller", 1, 5, 1, 2)
+    (32160371, "Yusepe", "Moroso Rossi", "Calle 10, Casa 5", "yusepe@mail.com", "0412-1112233", "0012345","EX-100", "Comuna A", "Ing. Sistemas", 4, 3, 1, 1),
+    (25987654, "Beximar", "Rodriguez", "Av. Principal 12", "bexi@mail.com", "0414-9998877", "0054321","EX-100", "Comuna B", "Lic. Administracion", 3, 1, 2, 1),
+    (18456123, "Carlos", "Perez", "Barrio El Centro", "carlos@mail.com", "0416-5554433", "0099887","EX-100", "Comuna C", "Bachiller", 1, 5, 1, 2)
 ]
 query_insert = """
     INSERT INTO personal (
         cedula, nombres, apellidos, direccion, correo, telefono,
-        carnet_patria, comuna, titulo_obtenido,
+        carnet_patria, codigo_docente,comuna, titulo_obtenido,
         id_grado, id_cargo, id_tipo_personal, id_estado_laboral
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 
@@ -43,7 +43,8 @@ class ClaseDB:
                 direccion TEXT,
                 correo TEXT,
                 telefono TEXT,
-                carnet_patria TEXT UNIQUE,
+                carnet_patria TEXT,
+                codigo_docente TEXT,
                 comuna TEXT,
                 titulo_obtenido TEXT,
                 id_grado INTEGER,
@@ -60,7 +61,7 @@ class ClaseDB:
 
 
         # Grados de Instrucción
-        grados = [("Bachiller",), ("Técnico Medio",), ("Licenciado",), ("Ingeniero",), ("Magister",)]
+        grados = [("No Graduado",),("Bachiller",), ("Técnico Medio",), ("Licenciado",), ("Ingeniero",), ("Magister",)]
         self.cursor.executemany("INSERT INTO grado_instruccion (nombre) VALUES (?)", grados)
 
         # Cargos

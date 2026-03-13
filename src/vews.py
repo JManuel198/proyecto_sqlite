@@ -16,7 +16,7 @@ class Star():
         self.crear_widgets()
 
     def crear_widgets(self):
-        self.campos = ('Codigo:','Cedula:','Nombres:','Apellidos:','Direccion:','Correo:','Telefono:','Carnet de la Patria: ','Comuna:','Titulo obtenido:','Grado:','Cargo:','Tipo personal:','Eestado laboral:') # campos usado por las ventanas
+        self.campos = ('Codigo:','Cedula:','Nombres:','Apellidos:','Direccion:','Correo:','Telefono:','Carnet de la Patria: ','Codigo Docente:','Comuna:','Titulo obtenido:','Grado:','Cargo:','Tipo personal:','Eestado laboral:') # campos usado por las ventanas
         self.crear_widgets_header()
         self.crear_widgets_tree()
 
@@ -101,6 +101,18 @@ class Star():
         for i,campo in enumerate(self.campos):
             label = tk.Label(self.ventana_agregar,text=campo)
             label.grid(row=i, column=0,pady=5, padx=5)
+        entry_codigo = tk.Entry(self.ventana_agregar).grid(row=0,column=1)
+        entry_cedula = tk.Entry(self.ventana_agregar).grid(row=1,column=1)
+        entry_nombres = tk.Entry(self.ventana_agregar).grid(row=2,column=1)
+        entry_apellidos = tk.Entry(self.ventana_agregar).grid(row=3,column=1)
+        entry_direccion = tk.Entry(self.ventana_agregar).grid(row=4,column=1)
+        entry_correo = tk.Entry(self.ventana_agregar).grid(row=5,column=1)
+        entry_telefono = tk.Entry(self.ventana_agregar).grid(row=6,column=1)
+        entry_codigo_docente = tk.Entry(self.ventana_agregar).grid(row=7,column=1)
+        entry_comuna = tk.Entry(self.ventana_agregar).grid(row=8,column=1)
+        entry_titulo_obtenido = tk.Entry(self.ventana_agregar).grid(row=9,column=1)
+        boton_guardar = tk.Button(self.ventana_agregar,text="Guardar").grid(row=10,column=2)
+
 
 
     def refrescar_tree(self):
@@ -118,7 +130,6 @@ class Star():
             cedulas_db.append(fila[0])
             # print(cedulas_db)
         if self.cedula_buscar in cedulas_db:
-            messagebox.showinfo("Yay","EXISTE!!!11!!")
             self.mostrar_ventana()
 
         else:
