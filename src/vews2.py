@@ -1,13 +1,16 @@
+import os
 import tkinter as tk
 from tkinter import ttk, messagebox
 from database2 import *
 
 class Star():
-    def __init__(self):
+    def __init__(self,es_director=False):
         self.rootapp = tk.Tk()
         self.rootapp.geometry("1500x800")
         self.rootapp.title("Sistema Administrativo de Registros")
         
+        self.superUsuario = es_director
+
         self.header_frame = tk.Frame(self.rootapp)
         self.header_frame.pack(side="top",fill="x")
         self.tree_frame = tk.Frame(self.rootapp)
@@ -277,18 +280,20 @@ class Star():
             self.entry_cedula.delete(0, tk.END)
 
     def crear_header_widgets(self):
-        self.boton_refrescar = tk.Button(self.header_frame,text="Refrescar",command=self.refrescar_tree)
+        self.boton_refrescar = tk.Button(self.header_frame,text="󰑐 Refrescar",command=self.refrescar_tree,font=("RobotoMono Nerd Font", 11, "bold"))
         self.boton_refrescar.grid(row=0,column=0)
-        self.entry_cedula = tk.Entry(self.header_frame)
+        self.entry_cedula = tk.Entry(self.header_frame,font=("RobotoMono Nerd Font", 11, "bold"))
         self.entry_cedula.grid(row=0,column=1)
-        self.boton_buscar = tk.Button(self.header_frame,text="Buscar",command=self.buscar_cedula)
+        self.boton_buscar = tk.Button(self.header_frame,text="󰍉 Buscar",command=self.buscar_cedula,font=("RobotoMono Nerd Font", 11, "bold"))
         self.boton_buscar.grid(row=0,column=2)
-        self.boton_nuevo = tk.Button(self.header_frame,text="Nuevo",command=self.crear_nuevo_ventana)
-        self.boton_nuevo.grid(row=0,column=3)
-        self.boton_modificar = tk.Button(self.header_frame,text="Modificar",command=self.preparar_edicion)
-        self.boton_modificar.grid(row=0,column=4)
-        self.boton_eliminar = tk.Button(self.header_frame,text="Eliminar",command=self.borrar_registro,bg="#e64553",fg="white")
-        self.boton_eliminar.grid(row=0,column=5)
+        self.boton_nuevo = tk.Button(self.header_frame,text="󰐕 Nuevo",command=self.crear_nuevo_ventana,font=("RobotoMono Nerd Font", 11, "bold"),bg="#40a02b",fg="white")
+        self.boton_modificar = tk.Button(self.header_frame,text="󰏫 Modificar",command=self.preparar_edicion,font=("RobotoMono Nerd Font", 11, "bold"),bg="#7287fd",fg="white")
+        self.boton_eliminar = tk.Button(self.header_frame,text="󰆴 Eliminar",command=self.borrar_registro,bg="#e64553",fg="white",font=("RobotoMono Nerd Font", 11, "bold"))
+
+        if self.superUsuario == True:
+            self.boton_nuevo.grid(row=0,column=3)
+            self.boton_eliminar.grid(row=0,column=5)
+            self.boton_modificar.grid(row=0,column=4)
 
     
     def crear_tree_widgets(self):
@@ -324,7 +329,63 @@ class Star():
         else:
             messagebox.showwarning("Error","No se encontro la cedula")
 
+if __name__ == "__main__":
+    def iniciar_sesion():
+        # IMPORTANTE: Usamos nombres distintos para el Widget y el Texto
+        # Si haces 'nombre = nombre.get()', pierdes el acceso al widget Entry
+        usuario_txt = entry_nombre.get().strip()
+        pass_txt = entry_password.get().strip()
 
+        if not usuario_txt or not pass_txt:
+            messagebox.showwarning("Atención", "Por favor llene todos los campos", parent=login)
+            return
 
-app = Star()
-app.rootapp.mainloop()
+        # Consulta segura para verificar credenciales
+        # Buscamos exactamente ese usuario y esa clave
+        consulta = db.consultar("SELECT nombre FROM Usuario WHERE nombre = ? AND password = ?", (usuario_txt, pass_txt))
+        
+        if consulta:
+            # Si la consulta devuelve algo, los datos son válidos
+            rol = consulta[0][0] # Obtenemos el nombre del usuario (ej: 'Director')
+            
+            # Destruimos la ventana de login antes de lanzar la principal
+            login.destroy()
+            
+            # Si el usuario es "Director", pasamos True para permisos especiales
+            app = Star(es_director=(rol == "Director"))
+            app.rootapp.mainloop()
+        else:
+            messagebox.showerror("Error", "Usuario o contraseña incorrectos", parent=login)
+    
+    login = tk.Tk()
+    login.title("Login - STAR")
+    
+    frame_titulo = tk.Frame(login)
+    frame_titulo.pack(padx=40, pady=5)
+    frame_entry = tk.Frame(login)
+    frame_entry.pack(padx=40, pady=5)
+
+    try:
+        directorio_actual = os.path.dirname(os.path.abspath(__file__))
+        ruta_imagen = os.path.join(directorio_actual, "logo.png")
+        logo = tk.PhotoImage(file=ruta_imagen)
+        image_logo = tk.Label(frame_titulo, image=logo)
+        image_logo.grid(row=0, column=0)
+    except Exception:
+        tk.Label(frame_titulo, text="[Logo no encontrado]").grid(row=0, column=0)
+
+    tk.Label(frame_titulo, text="Sistema Administrativo de Registros", 
+             font=("RobotoMono Nerd Font", 12, "bold")).grid(row=1, column=0, pady=10)
+
+    tk.Label(frame_entry, text="Nombre: ").grid(row=0, column=0)
+    entry_nombre = tk.Entry(frame_entry) # Cambiamos el nombre de la variable
+    entry_nombre.grid(row=0, column=1, pady=5)
+
+    tk.Label(frame_entry, text="Contraseña: ").grid(row=1, column=0)
+    entry_password = tk.Entry(frame_entry, show="*") # Ocultamos la clave
+    entry_password.grid(row=1, column=1, pady=5)
+
+    ingresar = tk.Button(login, text="󰍂 Ingresar", command=iniciar_sesion, bg="#40a02b", fg="white")
+    ingresar.pack(pady=10)
+
+    login.mainloop()

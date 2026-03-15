@@ -1,8 +1,7 @@
 import sqlite3
-
+# No toquen la base de datos, funciona y no se ni como, no domino SQL todavia pero parece funcionar decentemente
 class DB():
     def __init__(self, nombre_db):
-        # Permitir que las llaves foráneas funcionen en SQLite
         self.conexion = sqlite3.connect(nombre_db)
         self.conexion.execute("PRAGMA foreign_keys = ON;")
         self.cursor = self.conexion.cursor()
@@ -10,11 +9,9 @@ class DB():
     def consultar(self, sql, datos=()):
         self.cursor.execute(sql, datos)
         self.conexion.commit()
-        # Se agregan los paréntesis () para ejecutar la función fetchall
         return self.cursor.fetchall()
 
     def cerrar(self):
-        # Se agrega 'self' para poder acceder a la conexión
         self.conexion.close()
 
     def crear_esquema(self):
@@ -24,7 +21,6 @@ class DB():
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Estado_laboral (id_estado_laboral INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS Categoria_personal (id_categoria_personal INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL)")
         
-        # 2. Tabla Personal con nombres de columnas corregidos
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS Personal (
                                     id_personal INTEGER PRIMARY KEY AUTOINCREMENT,
                                     cedula INT UNIQUE NOT NULL,
@@ -50,7 +46,6 @@ class DB():
                                     FOREIGN KEY (id_estado_laboral) REFERENCES Estado_laboral(id_estado_laboral)
                                     )""")
 
-        # 3. Creación de la Vista (para devolver nombres en lugar de IDs)
         self.cursor.execute("DROP VIEW IF EXISTS vista_personal_detallada")
         self.cursor.execute("""
     CREATE VIEW vista_personal_detallada AS 
@@ -79,7 +74,7 @@ class DB():
     LEFT JOIN Estado_laboral e    ON p.id_estado_laboral = e.id_estado_laboral;
 """)
 
-        # 4. Triggers para automatizar Edad y Años de Servicio
+        # Triggers de edad y años de servicio, no tocar 
         self.cursor.execute("""
             CREATE TRIGGER IF NOT EXISTS calcular_datos_insert AFTER INSERT ON Personal
             BEGIN
@@ -100,14 +95,11 @@ class DB():
             END;
         """)
 
+        self.cursor.execute("INSERT OR IGNORE INTO Grado_instruccion (id_grado_instruccion, descripcion) VALUES (1, 'No Graduado'), (2, 'Bachiller'), (3, 'Tecnico Medio'), (4, 'Universitario'), (5,'Postgrado')")
+        self.cursor.execute("INSERT OR IGNORE INTO Estado_laboral (id_estado_laboral, nombre) VALUES (1, 'Activo'), (2, 'Reposo')")
+        self.cursor.execute("INSERT OR IGNORE INTO Categoria_personal (id_categoria_personal, nombre) VALUES (1, 'No graduado'), (2, 'Docente I'), (3, 'Docente II'), (4, 'Docente III'),(5, 'Docente IV'),(6, 'Docente V'),(7, 'Docente VI'),(8, 'Docente III'),(9, 'TSU I'),(10, 'TSU II'),(11, 'Profesional I'),(12, 'Profesional II'),(13,'Profesional III'),(14,'Obrero I'),(15,'Obrero II'),(16, 'Aseador I'),(17, 'Aseador II'),(18, 'Mensajero'),(19, 'Portero'),(20, 'Vigilante'),(21, 'Otro')")
+        self.cursor.execute("INSERT OR IGNORE INTO Usuario (nombre,password) VALUES ('Director','clave'),('Administrador','sexo')")
     def datos_prueba(self):
-            # 1. Asegurar tablas maestras con IDs fijos
-            self.cursor.execute("INSERT OR IGNORE INTO Grado_instruccion (id_grado_instruccion, descripcion) VALUES (1, 'No Graduado'), (2, 'Bachiller'), (3, 'Tecnico Medio'), (4, 'Universitario'), (5,'Postgrado')")
-            self.cursor.execute("INSERT OR IGNORE INTO Estado_laboral (id_estado_laboral, nombre) VALUES (1, 'Activo'), (2, 'Reposo')")
-            self.cursor.execute("INSERT OR IGNORE INTO Categoria_personal (id_categoria_personal, nombre) VALUES (1, 'No graduado'), (2, 'Docente I'), (3, 'Docente II'), (4, 'Docente III'),(5, 'Docente IV'),(6, 'Docente V'),(7, 'Docente VI'),(8, 'Docente III'),(9, 'TSU I'),(10, 'TSU II'),(11, 'Profesional I'),(12, 'Profesional II'),(13,'Profesional III'),(14,'Obrero I'),(15,'Obrero II'),(16, 'Aseador I'),(17, 'Aseador II'),(18, 'Mensajero'),(19, 'Portero'),(20, 'Vigilante'),(21, 'Otro')")
-
-            # 2. Datos de prueba completos (18 columnas según la estructura de la tabla)
-            # Nota: edad, anos_servicio y codigo_dependencia se dejan NULL porque los Triggers los llenarán
             personal_data = [
                 ('12345678', 'Yusepe', 'Rossi', '1985-05-20', 'Av. Intercomunal Casa 10', 'yrossi@email.com', '0412-1112233', '10002233', 'Ingeniero de Sistemas', '2015-01-15', 'Comuna Central', 'Analista IT', 3, 1, 1),
                 ('87654321', 'Beximar', 'Escalona', '1992-11-03', 'Calle 5 de Julio Edif. A', 'bescalona@email.com', '0414-4445566', '20005566', 'Lic. Educación', '2018-03-10', 'Comuna Norte', 'Docente de Aula', 3, 3, 1),
@@ -116,7 +108,7 @@ class DB():
                 ('9556677', 'Ricardo', 'Mendoza', '1975-12-30', 'Urb. El Parque Calle 2', 'rmendoza@email.com', '0412-9990011', '50000011', 'Magister Gerencia', '2010-09-01', 'Comuna Central', 'Director', 4, 4, 1)
             ]
 
-            # Usamos REPLACE para que sobrescriba los registros viejos que tenían valores NULL
+
             self.cursor.executemany("""
                 INSERT OR REPLACE INTO Personal (
                     cedula, nombres, apellidos, fecha_nacimiento, direccion, 
@@ -127,8 +119,7 @@ class DB():
 
             self.conexion.commit()
             self.conexion.commit()
-# --- Ejecución del programa ---
-db = DB(":memory:") # Cambiado de :memory: a un archivo para que lo veas
+
+db = DB(":memory:") 
 db.crear_esquema()
-db.datos_prueba()
 
